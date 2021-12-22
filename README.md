@@ -1,5 +1,5 @@
 # Mini-OCaml Interpreter
-Small interpreter written in OCaml for sub-language Mini OCaml
+Small interpreter written in Meta-Language OCaml for Object-Language "Mini-OCaml"
 
 ## Planned Features
 - Lexer / Tokenizer
