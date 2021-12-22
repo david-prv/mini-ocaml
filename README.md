@@ -7,3 +7,6 @@ Small interpreter written in Meta-Language OCaml for Object-Language "Mini-OCaml
 - Check for free Vars
 - Type Checking / Guessing
 - Evaluation
+
+## Abstract Grammar
+![grammar](https://david-dewes.de/img/grammar.png)
