@@ -114,8 +114,13 @@ and eval_if env v ex1 ex2 = match v with
 
 (* TOPLEVEL *)
 
-let environment = empty ;;
+let env = empty ;;
+let env' = empty ;;
 let exp = (Con(Icon 1)) ;;
 let exp' = (Var "x") ;;
 let exp'' = (Oapp(Add, Con(Icon 1), Con(Icon 2))) ;;
-eval environment exp'' ;; (* yields Ival 3 *)
+let exp_lam = (Lamty("x", Int, Oapp(Add, Var "x", Con(Icon 2)))) ;; 
+let exp_lr = (Letrecty("f", "x", Int, Int, Oapp(Add, Var "x", Con(Icon 2)), Lamty("y", Int, Oapp(Add, Var "y", Con(Icon 2))))) ;;
+eval env exp'' ;; (* yields Ival 3 *)
+eval env exp_lam ;; (* yields closure (x,e,V) *)
+eval env' exp_lr ;; 
