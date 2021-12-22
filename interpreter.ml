@@ -40,14 +40,7 @@ let rec lookup x (env : ('a,'b) env) =
 
 (* TYPE CHECKER *)
 
-let rec type_checker env exp : ty =
-  let check_operation operation x1 x2 =
-    match operation with
-    | Add -> if (x1 = Int) && (x2 = Int) then Arrow(Int,Arrow(Int,Int)) else failwith "check_op: Add is ill-typed"
-    | Sub -> if (x1 = Int) && (x2 = Int) then Arrow(Int,Arrow(Int,Int)) else failwith "check_op: Sub is ill-typed"
-    | Mul -> if (x1 = Int) && (x2 = Int) then Arrow(Int,Arrow(Int,Int)) else failwith "check_op: Mul is ill-typed"
-    | Leq -> if (x1 = Int) && (x2 = Int) then Arrow(Int,Arrow(Int,Int)) else failwith "check_op: Leq is ill-typed"
-  in
+let rec type_checker env exp : ty = 
   match exp with
   | Con(con) -> begin
       match con with
@@ -55,8 +48,29 @@ let rec type_checker env exp : ty =
       | Icon(int) -> Int 
     end
   | Var(var) -> lookup var env
-  | Oapp(op,ex1,ex2) -> check_operation op (type_checker env ex1) (type_checker env ex2)
-  | _ -> failwith "test" 
+  | Oapp(op,ex1,ex2) -> check_oapp op (type_checker env ex1) (type_checker env ex2)
+  | Fapp(ex1,ex2) -> check_fapp (type_checker env ex1) (type_checker env ex2)
+  | If(ex1,ex2,ex3) -> check_if (type_checker env ex1) (type_checker env ex2) (type_checker env ex3)
+  | Lam(_,_) -> failwith "type_checker: missing lambda type"
+  | Lamty(x,ty,ex) -> Arrow(ty, type_checker (update env x ty) ex)
+  | Let(x,ex1,ex2) -> type_checker (update env x (type_checker env ex1)) ex2
+  | Letrec(f,x,ex1,ex2) -> failwith "type_checker: missing let rec type"
+  | Letrecty(f,x,ty1,ty2,ex1,ex2) -> Arrow(ty1, type_checker (update env f (Arrow(ty1, ty2))) ex2)
+and check_oapp op x1_ty x2_ty =
+  match x1_ty, x2_ty with
+  | Int, Int -> Arrow(x1_ty, x2_ty)
+  | _, _ -> failwith "check_oapp: operation is ill-typed"
+and check_fapp fun_ty exp_ty =
+  match fun_ty with
+  | Arrow(Int,t2) -> if exp_ty = Int then fun_ty else failwith "check_fapp: expression has unexpected type"
+  | Arrow(Bool,t2) -> if exp_ty = Bool then fun_ty else failwith "check_fapp: expression has unexpected type"
+  | _ -> failwith "check_fapp: Illegal application (no function given)"
+and check_if ex1_ty ex2_ty ex3_ty =
+  if ex1_ty = Bool then
+    if ex2_ty = ex3_ty then ex2_ty
+    else failwith "check_if: If is ill-typed"
+  else failwith "check_if: If is ill-typed"
+    
 
 (* EVALUATION *)
 
