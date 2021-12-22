@@ -9,4 +9,5 @@ Small interpreter written in Meta-Language OCaml for Object-Language "Mini-OCaml
 - Evaluation
 
 ## Abstract Grammar
-![grammar](https://david-dewes.de/img/grammar.png)
+![grammar-light-mode](https://raw.githubusercontent.com/david-prv/mini-ocaml/main/grammar/grammar.png#gh-light-mode-only)
+![grammar-dark-mode](https://raw.githubusercontent.com/david-prv/mini-ocaml/main/grammar/grammar-dark.png#gh-dark-mode-only)
