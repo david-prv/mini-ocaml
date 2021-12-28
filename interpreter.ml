@@ -39,7 +39,7 @@ let rec mem x l =
 let rec lookup x (env : ('a,'b) env) =
   match env with
   | (key, value) :: t -> if key = x then value else lookup x t
-  | [] -> failwith "lookup: unbound value" 
+  | [] -> failwith "lookup: unbound value"
                 
 (* LEXER / TOKENIZER *) 
 
@@ -93,7 +93,7 @@ let rec eval env exp : value =
   | Fapp(ex1,ex2) -> eval_fun env ex1 ex2
   | If(ex1,ex2,ex3) -> eval_if env (eval env ex1) ex2 ex3
   | Lam(x,exp) | Lamty(x,_,exp) -> Closure (x,exp,env)
-  | Let(x,ex1,ex2) -> eval (update env x (eval env ex2)) ex2
+  | Let(x,ex1,ex2) -> eval (update env x (eval env ex1)) ex2
   | Letrec(f,x,ex1,ex2) | Letrecty(f,x,_,_,ex1,ex2) -> eval (update env f (Bclosure (f,x,ex1,env))) ex2
 and eval_op op v1 v2 = match op, v1, v2 with
   | Add, Ival(i1), Ival(i2) -> Ival (i1 + i2)
@@ -101,12 +101,10 @@ and eval_op op v1 v2 = match op, v1, v2 with
   | Mul, Ival(i1), Ival(i2) -> Ival (i1 * i2)
   | Leq, Ival(i1), Ival(i2) -> Bval (i1 <= i2)
   | _ -> failwith "eval_op: unexpected value (maybe a closure?)"
-and eval_fun env ex1 ex2 = let var = match ex2 with
-    | Lam(x,_) | Lamty(x,_,_) -> x
-    | Let(x,_,_) | Letrec(x,_,_,_) -> x
-    | Letrecty(_,x,_,_,_,_) -> x
-    | _ -> failwith "eval_fun: function does not take arguments"
-  in eval (update env var (eval env ex1)) ex2
+and eval_fun env ex1 ex2 = let v1 = (eval env ex1) in match v1 with
+  | Closure (x,e,env) -> eval (update env x (eval env ex2)) e
+  | Bclosure (f,x,e,env) -> eval (update (update env f v1) x (eval env ex2)) e
+  | _ -> failwith "eval_fun: function does not take arguments (not a closure?)"
 and eval_if env v ex1 ex2 = match v with
   | Bval(true) -> eval env ex1
   | Bval(false) -> eval env ex2
