@@ -84,7 +84,7 @@ let lex s =
       | '+' -> lex (i+1) (ADD::l)
       | '-' -> begin
           match String.get s (i+1) with
-          | '>' -> lex (i+1) (ARR::l)
+          | '>' -> lex (i+2) (ARR::l)
           | _ -> lex (i+1) (SUB::l)
         end
       | '*' -> lex (i+1) (MUL::l)
@@ -198,6 +198,11 @@ and eval_if env v ex1 ex2 = match v with
   | Bval(true) -> eval env ex1
   | Bval(false) -> eval env ex2
   | _ -> failwith "eval_if: unexpected value (maybe a closure?)"
+
+(* CHECKSTR & EVALSTR *)  
+
+let checkStr s = failwith "not done yet" ;;
+let evalStr s = failwith "not done yet" ;;
 
 (* TOPLEVEL *)
 
