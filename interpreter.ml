@@ -207,7 +207,7 @@ and eval_if env v ex1 ex2 = match v with
 
 (* CHECKSTR & EVALSTR *)  
 
-let checkStr s = check empty s ;;
+let checkStr s = check empty (parse (lex s)) ;;
 let evalStr s = eval empty (parse (lex s)) ;;
 
 (* TOPLEVEL *)
