@@ -70,7 +70,11 @@ let lex s =
     if i >= n then List.rev l
     else match String.get s i with
       | '+' -> lex (i+1) (ADD::l)
-      | '-' -> lex (i+1) (SUB::l)
+      | '-' -> begin
+          match String.get s (i+1) with
+          | '>' -> lex (i+1) (ARR::l)
+          | _ -> lex (i+1) (SUB::l)
+        end
       | '*' -> lex (i+1) (MUL::l)
       | '(' -> lex (i+1) (LP::l)
       | ')' -> lex (i+1) (RP::l)
