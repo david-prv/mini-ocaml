@@ -55,6 +55,13 @@ let input = "let rec f x = if x <= 4 then f (x-1) else false in x" ;;
 checkStr input ;;
 evalStr input ;;
 
+(* more complex recursive expression *)
+let input = "let rec fac a = fun n ->
+    if n <= 1 then a else fac (n*a) (n-1) 
+   in fac 1 5" ;;
+checkStr input ;;
+evalStr input ;;
+
 (* lambda expression *)
 let input = "let f = fun x -> x + 1 in f 1" ;;
 checkStr input ;;
@@ -73,6 +80,7 @@ The interpreter is divided in 4 layers:
 
 ### Workflow
 It goes through every layer as follows:
+  
 1. Lexical Syntax: A provided string (assuming it's a mini-ocaml script) will first of all be converted to a list of so-called ``tokens`` (read more about [tokenizer/lexer](https://bit.ly/3HAZn9x))  
 ↓
 2. Phrasal Syntax: As a next step the token list will be interpreted as syntax tree, called ``parsing`` (what is a [parser](https://de.wikipedia.org/wiki/Parser)?)  
