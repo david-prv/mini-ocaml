@@ -6,8 +6,8 @@ Small interpreter written in Meta-Language OCaml for Object-Language "Mini-OCaml
 2. [Abstract Grammar](https://github.com/david-prv/mini-ocaml#abstract-grammar)
 3. [Usage & Examples](https://github.com/david-prv/mini-ocaml#usage)
 4. [How does it work](https://github.com/david-prv/mini-ocaml#how-does-it-work)
-    1. [4 Layers](https://github.com/david-prv/mini-ocaml#4-layers) 
-    2. [Workflow](https://github.com/david-prv/mini-ocaml#workflow) 
+    * [4 Layers](https://github.com/david-prv/mini-ocaml#4-layers) 
+    * [Workflow](https://github.com/david-prv/mini-ocaml#workflow) 
 
 ## Planned Features
 * Lexer / Tokenizer
