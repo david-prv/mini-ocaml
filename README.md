@@ -1,6 +1,12 @@
 # Mini-OCaml Interpreter
 Small interpreter written in Meta-Language OCaml for Object-Language "Mini-OCaml"
 
+## Table of contents
+1. [Planned Features](https://github.com/david-prv/mini-ocaml#planned-features)
+2. [Abstract Grammar](https://github.com/david-prv/mini-ocaml#abstract-grammar)
+3. [Usage & Examples](https://github.com/david-prv/mini-ocaml#usage)
+4. [How does it work](https://github.com/david-prv/mini-ocaml#how-does-it-work)
+
 ## Planned Features
 - Lexer / Tokenizer
 - Parser
@@ -52,3 +58,9 @@ let input = "let f = fun x -> x + 1 in f 1" ;;
 checkStr input ;;
 evalStr input ;;
 ```
+
+## How does it work
+1. A provided string (assuming it's a mini-ocaml script) will first of all be converted to a list of so-called ``tokens`` (read more about [tokenizer](https://bit.ly/3HAZn9x))
+2. As a next step the token list will be interpreted as syntax tree, called ``parsing`` (what is a [parser](https://de.wikipedia.org/wiki/Parser)?)
+3. ``checkStr`` then does something, what is called ``algorithmic reading``, what will check the type for the provided script and ofc for free variables.
+4. ``evalStr`` will now take the lexed and parsed syntax tree and execute it in its logical order. After that, you will finally get a value as result.
