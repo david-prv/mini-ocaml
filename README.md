@@ -60,7 +60,16 @@ evalStr input ;;
 ```
 
 ## How does it work
-1. A provided string (assuming it's a mini-ocaml script) will first of all be converted to a list of so-called ``tokens`` (read more about [tokenizer](https://bit.ly/3HAZn9x))
-2. As a next step the token list will be interpreted as syntax tree, called ``parsing`` (what is a [parser](https://de.wikipedia.org/wiki/Parser)?)
-3. ``checkStr`` then does something, what is called ``algorithmic reading``, what will check the type for the provided script and ofc for free variables.
-4. ``evalStr`` will now take the lexed and parsed syntax tree and execute it in its logical order. After that, you will finally get a value as result.
+The interpreter is divided in 4 layers:
+| Layer             | Layer Type |
+|-------------------|------------|
+| Lexical Syntax    | Static     |
+| Phrasal Syntax    | Static     |
+| Static Semantics  | Static     |
+| Dynamic Semantics | Dynamic    |
+
+It goes through every layer as follows:
+1. LEXICAL SYNTAX: A provided string (assuming it's a mini-ocaml script) will first of all be converted to a list of so-called ``tokens`` (read more about [tokenizer/lexer](https://bit.ly/3HAZn9x))
+2. PHRASAL SYNTAX: As a next step the token list will be interpreted as syntax tree, called ``parsing`` (what is a [parser](https://de.wikipedia.org/wiki/Parser)?)
+3. STATIC SEMANTICS: ``checkStr`` then does something, what is called ``algorithmic reading``, what will check the type for the provided script and ofc for free variables.
+4. DYNAMIC SEMANTICS: ``evalStr`` will now take the lexed and parsed syntax tree and execute it in its logical order. After that, you will finally get a value as result.
