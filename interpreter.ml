@@ -69,7 +69,11 @@ and verify_let' t =
   | 'i'::'n'::t -> true
   | _ :: t -> verify_let' t 
                 
-let rec verify_fun t = true ;;
+let rec verify_fun t =
+  match t with
+  | [] -> false
+  | _::x::_::'-'::'>'::t -> true
+  | _ -> false
 
 let lex s =
   let n = String.length s in
@@ -209,6 +213,9 @@ let evalStr s = failwith "not done yet" ;;
 let test = lex "let x = 1 in x" ;;
 let test' = lex "let x = if 1 <= 2 then 3 else 4 in x" ;;
 let test'' = lex "let rec f x = if 1 <= 2 then 4 else 2 in f x" ;;
+let test''' = lex "let f = fun x -> x + 1 in f 1" ;;
+
+let evaltest = eval empty (Let("f" , Lam("x", Oapp(Add, Var "x", Con(Icon 1))) , Fapp(Var "f", Con(Icon 1))))
 
 (*let env = empty ;;
 let env' = empty ;;
