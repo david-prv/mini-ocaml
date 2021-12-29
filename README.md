@@ -8,11 +8,11 @@ Small interpreter written in Meta-Language OCaml for Object-Language "Mini-OCaml
 4. [How does it work](https://github.com/david-prv/mini-ocaml#how-does-it-work)
 
 ## Planned Features
-- Lexer / Tokenizer
-- Parser
-- Check for free Vars
-- Type Checking / Guessing
-- Evaluation
+* Lexer / Tokenizer
+* Parser
+* Check for free Vars
+* Type Checking / Guessing
+* Evaluation
 
 ## Abstract Grammar
 ```bnf
