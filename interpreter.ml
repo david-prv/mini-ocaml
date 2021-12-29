@@ -24,7 +24,7 @@ type value = Bval of bool
            | Closure of var * exp * (var,value) env
            | Bclosure of var * var * exp * (var,value) env 
 type token = LP | RP | EQ | COL | ARR | LAM | ADD | SUB | MUL | LEQ
-           | IF | THEN | ELSE | LET | REC | IN | CON of con | VAR of string | BOOL | INT
+           | IF | THEN | ELSE | LET | REC | IN | CON of token | VAR of string | BOOL | INT
   
 (* HELPER FUNCTIONS *)
 
@@ -75,13 +75,17 @@ let rec verify_fun t =
   | _::x::_::'-'::'>'::t -> true
   | _ -> false
 
+let isSymbol c =
+  match c with
+  | '+' | '-' | '>' | '<' | '=' | '(' | ')' | ':' | '*' | ' ' -> true 
+  | _ -> false
+
 let rec makeVar t : int * string =
   let c = 0 in
   let rec makeVar' count t akku : int * string =
     match t with
-    | [] -> (count, akku)
-    | ' '::t -> (count, akku)
-    | x::t -> makeVar' (count+1) t (akku ^ (String.make 1 x)) 
+    | [] -> (count, akku) 
+    | x::t -> if isSymbol x then (count,akku) else makeVar' (count+1) t (akku ^ (String.make 1 x)) 
   in makeVar' c t ""    
 
 let lex s =
@@ -137,12 +141,10 @@ let lex s =
               end
             | 'r'::'e'::'c'::t -> lex (i+3) (REC::tl)
             | 'i'::'n'::t -> lex (i+2) (IN::tl)
-            | 't'::'r'::'u'::'e'::t | 'f'::'a'::'l'::'s'::'e'::t -> lex (i+1) (BOOL::tl)
+            | 't'::'r'::'u'::'e'::t | 'f'::'a'::'l'::'s'::'e'::t -> lex (i+1) (CON(BOOL)::tl)
             | x :: t -> match x with
-              | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' -> lex (i+1) (INT::tl)
-              | _ -> match t with
-                | ' '::t -> lex (i+1) (VAR(String.make 1 x)::tl)
-                | y::' '::t -> lex (i+2) (VAR((String.make 1 x) ^ (String.make 1 y))::tl)
+              | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' -> lex (i+1) (CON(INT)::tl)
+              | _ -> match t with 
                 | y::t -> let (j,str) = makeVar (x::y::t) in lex (i+j) (VAR(str)::tl) 
                 | _ -> lex (i+1) (VAR(String.make 1 x)::tl)
           in lex_c char_list l i
@@ -233,6 +235,7 @@ let omega_test = lex "let omega = fun x -> x x in omega omega" ;;
 
 lex "let test123 = 1 in 1" ;;
 lex "let 1 = 1 in 1" ;; 
+lex "let test123=1 in test123" ;;
 
 let evaltest = eval empty (Let("f" , Lam("x", Oapp(Add, Var "x", Con(Icon 1))) , Fapp(Var "f", Con(Icon 1))))
 
