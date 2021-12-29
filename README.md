@@ -11,7 +11,7 @@ Small interpreter written in Meta-Language OCaml for Object-Language "Mini-OCaml
 ## Abstract Grammar
 ```bnf
 <var> ::= string
-<cons> ::= B | N
+<cons> ::= 𝔹 | ℕ
 <type> ::= <cons>| <type> → <type>
 <operator> ::= ⊕ | ⊖ | ⊗ | ≤
 <expression> ::= <var> | <cons> | <expression> ∘ <expression> | <expression> <expression>
