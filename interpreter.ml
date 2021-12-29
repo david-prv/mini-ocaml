@@ -65,7 +65,7 @@ let rec verify_let t =
   | _ :: t -> verify_let t
 and verify_let' t =
   match t with
-  | [] -> false
+  | [] -> false 
   | 'i'::'n'::t -> true
   | _ :: t -> verify_let' t 
                 
@@ -74,6 +74,15 @@ let rec verify_fun t =
   | [] -> false
   | _::x::_::'-'::'>'::t -> true
   | _ -> false
+
+let rec makeVar t : int * string =
+  let c = 0 in
+  let rec makeVar' count t akku : int * string =
+    match t with
+    | [] -> (count, akku)
+    | ' '::t -> (count, akku)
+    | x::t -> makeVar' (count+1) t (akku ^ (String.make 1 x)) 
+  in makeVar' c t ""    
 
 let lex s =
   let n = String.length s in
@@ -131,7 +140,11 @@ let lex s =
             | 't'::'r'::'u'::'e'::t | 'f'::'a'::'l'::'s'::'e'::t -> lex (i+1) (BOOL::tl)
             | x :: t -> match x with
               | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' -> lex (i+1) (INT::tl)
-              | _ -> lex (i+1) (VAR(String.make 1 x)::tl)
+              | _ -> match t with
+                | ' '::t -> lex (i+1) (VAR(String.make 1 x)::tl)
+                | y::' '::t -> lex (i+2) (VAR((String.make 1 x) ^ (String.make 1 y))::tl)
+                | y::t -> let (j,str) = makeVar (x::y::t) in lex (i+j) (VAR(str)::tl) 
+                | _ -> lex (i+1) (VAR(String.make 1 x)::tl)
           in lex_c char_list l i
         end
   in lex 0 [] ;;
@@ -216,6 +229,10 @@ let test = lex "let x = 1 in x" ;;
 let test' = lex "let x = if 1 <= 2 then 3 else 4 in x" ;;
 let test'' = lex "let rec f x = if 1 <= 2 then 4 else 2 in f x" ;;
 let test''' = lex "let f = fun x -> x + 1 in f 1" ;;
+let omega_test = lex "let omega = fun x -> x x in omega omega" ;;
+
+lex "let test123 = 1 in 1" ;;
+lex "let 1 = 1 in 1" ;; 
 
 let evaltest = eval empty (Let("f" , Lam("x", Oapp(Add, Var "x", Con(Icon 1))) , Fapp(Var "f", Con(Icon 1))))
 
