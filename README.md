@@ -2,19 +2,19 @@
 Small interpreter written in Meta-Language OCaml for Object-Language "Mini-OCaml"
 
 ## Table of contents
-1. [Planned Features](https://github.com/david-prv/mini-ocaml#planned-features)
+1. [ToDo Features](https://github.com/david-prv/mini-ocaml#todo-features)
 2. [Abstract Grammar](https://github.com/david-prv/mini-ocaml#abstract-grammar)
 3. [Usage & Examples](https://github.com/david-prv/mini-ocaml#usage)
 4. [How does it work](https://github.com/david-prv/mini-ocaml#how-does-it-work)
     * [4 Layers](https://github.com/david-prv/mini-ocaml#4-layers) 
     * [Workflow](https://github.com/david-prv/mini-ocaml#workflow) 
 
-## Planned Features
-* Lexer / Tokenizer
-* Parser
-* Check for free Vars
-* Type Checking / Guessing
-* Evaluation
+## ToDo Features:
+- [ ] Lexer / Tokenizer
+- [ ] Parser
+- [x] Check for free Vars
+- [x] Type Checking / Guessing
+- [x] Evaluation
 
 ## Abstract Grammar
 ```bnf
@@ -73,7 +73,10 @@ The interpreter is divided in 4 layers:
 
 ### Workflow
 It goes through every layer as follows:
-1. LEXICAL SYNTAX: A provided string (assuming it's a mini-ocaml script) will first of all be converted to a list of so-called ``tokens`` (read more about [tokenizer/lexer](https://bit.ly/3HAZn9x))
-2. PHRASAL SYNTAX: As a next step the token list will be interpreted as syntax tree, called ``parsing`` (what is a [parser](https://de.wikipedia.org/wiki/Parser)?)
-3. STATIC SEMANTICS: ``checkStr`` then does something, what is called ``algorithmic reading``, what will check the type for the provided script and ofc for free variables.
-4. DYNAMIC SEMANTICS: ``evalStr`` will now take the lexed and parsed syntax tree and execute it in its logical order. After that, you will finally get a value as result.
+1. Lexical Syntax: A provided string (assuming it's a mini-ocaml script) will first of all be converted to a list of so-called ``tokens`` (read more about [tokenizer/lexer](https://bit.ly/3HAZn9x))  
+↓
+2. Phrasal Syntax: As a next step the token list will be interpreted as syntax tree, called ``parsing`` (what is a [parser](https://de.wikipedia.org/wiki/Parser)?)  
+↓
+3. Static Semantics: ``checkStr`` then does something, what is called ``algorithmic reading``, what will check the type for the provided script and ofc for free variables.  
+↓
+4. Dynamic Semantics: ``evalStr`` will now take the lexed and parsed syntax tree and execute it in its logical order. After that, you will finally get a value as result.
