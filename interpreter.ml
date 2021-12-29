@@ -24,9 +24,17 @@ type value = Bval of bool
            | Closure of var * exp * (var,value) env
            | Bclosure of var * var * exp * (var,value) env 
 type token = LP | RP | EQ | COL | ARR | LAM | ADD | SUB | MUL | LEQ
-           | IF | THEN | ELSE | LET | REC | IN | CON of token | VAR of string | BOOL | INT
+           | IF | THEN | ELSE | LET | REC | IN | CON of con | VAR of string | BOOL | INT
   
 (* HELPER FUNCTIONS *)
+
+let string2digit s =
+  let s = String.make 1 s in
+  match s with
+  | "1" -> 1 | "4" -> 4 | "7" -> 7
+  | "2" -> 2 | "5" -> 5 | "8" -> 8
+  | "3" -> 3 | "6" -> 6 | "9" -> 9
+  | "0" -> 0 | _ -> failwith "string2digit: illegal character"
 
 let empty : ('a, 'b) env = []
 let update (environment : ('a,'b) env) key value : ('a,'b) env =
@@ -141,10 +149,14 @@ let lex s =
                   failwith "lex: 'let' syntax error"
               end
             | 'r'::'e'::'c'::t -> lex (i+3) (REC::tl)
-            | 'i'::'n'::t -> lex (i+2) (IN::tl)
-            | 't'::'r'::'u'::'e'::t | 'f'::'a'::'l'::'s'::'e'::t -> lex (i+1) (CON(BOOL)::tl)
+            | 'i'::'n'::t -> begin 
+                match t with | 't'::t -> failwith "not yet done"
+                             | _ -> lex (i+2) (IN::tl)
+              end
+            | 't'::'r'::'u'::'e'::t -> lex (i+1) (CON(Bcon true)::tl)
+            | 'f'::'a'::'l'::'s'::'e'::t -> lex (i+1) (CON(Bcon false)::tl)
             | x :: t -> match x with
-              | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' -> lex (i+1) (CON(INT)::tl)
+              | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' -> lex (i+1) (CON(Icon(string2digit x))::tl)
               | _ -> match t with 
                 | y::t -> let (j,str) = makeVar (x::y::t) in lex (i+j) (VAR(str)::tl) 
                 | _ -> lex (i+1) (VAR(String.make 1 x)::tl)
@@ -238,10 +250,11 @@ lex "let 1 = 1 in 1" ;;
 lex "let test123=1 in test123" ;;
 lex  "let rec fac a = fun n ->
     if n <= 1 then a else fac (n*a) (n-1) 
-   in fac 1 5" ;;
+in fac 1 5" ;;
 lex "LeT x = 3 In x" ;;
 
 eval empty (Let("f" , Lam("x", Oapp(Add, Var "x", Con(Icon 1))) , Fapp(Var "f", Con(Icon 1)))) ;;
+check empty (Let("f" , Lam("x", Oapp(Add, Var "x", Con(Icon 1))) , Fapp(Var "f", Con(Icon 1)))) ;;
 eval empty (Let("x", Con(Icon 3), Var "x")) ;;
 
 (*let env = empty ;;
