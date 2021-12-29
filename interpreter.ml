@@ -56,8 +56,20 @@ let rec verify_if t =
       in verify_if' t
     end
   | _ :: t -> verify_if t
-let rec verify_let t = true ;;
-let rec verify_fun t= true ;;
+                
+let rec verify_let t = 
+  match t with
+  | [] -> false
+  | 'r'::'e'::'c'::_::f::_::x::t -> verify_let' t 
+  | _::x::_::'='::t -> verify_let' t
+  | _ :: t -> verify_let t
+and verify_let' t =
+  match t with
+  | [] -> false
+  | 'i'::'n'::t -> true
+  | _ :: t -> verify_let' t 
+                
+let rec verify_fun t = true ;;
 
 let lex s =
   let n = String.length s in
@@ -82,19 +94,19 @@ let lex s =
       | '<' -> begin
           match String.get s (i+1) with
           | '=' -> lex (i+2) (LEQ::l)
-          | _ -> failwith "lex: syntax error"
+          | _ -> failwith "lex: unknown operator '<'"
         end
       | '=' -> lex (i+1) (EQ::l)
       | ' ' | '\n' | '\t' -> lex (i+1) l
       | _ -> begin 
-          let char_list = explode (String.sub s i ((String.length s) - i)) in
+          let char_list = explode (String.sub s i ((String.length s) - i)) in 
           let rec lex_c cl tl i = match cl with
-            | [] -> failwith "lex: syntax error"
+            | [] -> failwith "lex: expression is not exhaustive"
             | 'i'::'f'::t -> begin
                 if verify_if t then
                   lex (i+2) (IF::tl)
                 else
-                  failwith "lex: syntax error"
+                  failwith "lex: 'if' syntax error"
               end
             | 't'::'h'::'e'::'n'::t -> lex (i+4) (THEN::tl)
             | 'e'::'l'::'s'::'e'::t -> lex (i+4) (ELSE::tl)
@@ -102,17 +114,20 @@ let lex s =
                 if verify_fun t then
                   lex (i+3) (LAM::tl)
                 else
-                  failwith "lex: syntax error"
+                  failwith "lex: 'fun' syntax error"
               end  
             | 'l'::'e'::'t'::t -> begin
                 if verify_let t then
                   lex (i+3) (LET::tl)
                 else
-                  failwith "lex: syntax error"
+                  failwith "lex: 'let' syntax error"
               end
             | 'r'::'e'::'c'::t -> lex (i+3) (REC::tl)
             | 'i'::'n'::t -> lex (i+2) (IN::tl)
-            | _ -> lex (i+1) tl
+            | 't'::'r'::'u'::'e'::t | 'f'::'a'::'l'::'s'::'e'::t -> lex (i+1) (BOOL::tl)
+            | x :: t -> match x with
+              | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' -> lex (i+1) (INT::tl)
+              | _ -> lex (i+1) (VAR(String.make 1 x)::tl)
           in lex_c char_list l i
         end
   in lex 0 [] ;;
@@ -186,7 +201,11 @@ and eval_if env v ex1 ex2 = match v with
 
 (* TOPLEVEL *)
 
-let env = empty ;;
+let test = lex "let x = 1 in x" ;;
+let test' = lex "let x = if 1 <= 2 then 3 else 4 in x" ;;
+let test'' = lex "let rec f x = if 1 <= 2 then 4 else 2 in f x" ;;
+
+(*let env = empty ;;
 let env' = empty ;;
 let exp = (Con(Icon 1)) ;;
 let exp' = (Var "x") ;;
@@ -196,3 +215,4 @@ let exp_lr = (Letrecty("f", "x", Int, Int, Oapp(Add, Var "x", Con(Icon 2)), Lamt
 eval env exp'' ;; (* yields Ival 3 *)
 eval env exp_lam ;; (* yields closure (x,e,V) *)
 eval env' exp_lr ;; (* yields bclosure (f,x,e,V) *)
+eval empty (Oapp(Leq,(Oapp(Add, Con(Icon 1), Con(Icon 3))), Con(Icon 5))) (* yields Bval true *)*)
