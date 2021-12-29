@@ -138,6 +138,8 @@ let lex s =
 
 (* PARSER *)
 
+let rec parse s : exp = failwith "not done yet" ;;
+
 (* TYPE CHECKER *)
 
 let rec check env exp : ty = 
@@ -205,8 +207,8 @@ and eval_if env v ex1 ex2 = match v with
 
 (* CHECKSTR & EVALSTR *)  
 
-let checkStr s = failwith "not done yet" ;;
-let evalStr s = failwith "not done yet" ;;
+let checkStr s = check empty s ;;
+let evalStr s = eval empty (parse (lex s)) ;;
 
 (* TOPLEVEL *)
 
