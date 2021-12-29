@@ -90,6 +90,7 @@ let rec makeVar t : int * string =
 
 let lex s =
   let n = String.length s in
+  let s = String.lowercase_ascii s in
   let explode s =
     let rec explode' s i a =
       if i = String.length s then a
@@ -227,17 +228,21 @@ let evalStr s = eval empty (parse (lex s)) ;;
 
 (* TOPLEVEL *)
 
-let test = lex "let x = 1 in x" ;;
-let test' = lex "let x = if 1 <= 2 then 3 else 4 in x" ;;
-let test'' = lex "let rec f x = if 1 <= 2 then 4 else 2 in f x" ;;
-let test''' = lex "let f = fun x -> x + 1 in f 1" ;;
-let omega_test = lex "let omega = fun x -> x x in omega omega" ;;
-
+lex "let x = 1 in x" ;;
+lex "let x = if 1 <= 2 then 3 else 4 in x" ;;
+lex "let rec f x = if 1 <= 2 then 4 else 2 in f x" ;;
+lex "let f = fun x -> x + 1 in f 1" ;;
+lex "let omega = fun x -> x x in omega omega" ;; 
 lex "let test123 = 1 in 1" ;;
 lex "let 1 = 1 in 1" ;; 
 lex "let test123=1 in test123" ;;
+lex  "let rec fac a = fun n ->
+    if n <= 1 then a else fac (n*a) (n-1) 
+   in fac 1 5" ;;
+lex "LeT x = 3 In x" ;;
 
-let evaltest = eval empty (Let("f" , Lam("x", Oapp(Add, Var "x", Con(Icon 1))) , Fapp(Var "f", Con(Icon 1))))
+eval empty (Let("f" , Lam("x", Oapp(Add, Var "x", Con(Icon 1))) , Fapp(Var "f", Con(Icon 1)))) ;;
+eval empty (Let("x", Con(Icon 3), Var "x")) ;;
 
 (*let env = empty ;;
 let env' = empty ;;
