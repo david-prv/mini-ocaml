@@ -9,5 +9,15 @@ Small interpreter written in Meta-Language OCaml for Object-Language "Mini-OCaml
 - Evaluation
 
 ## Abstract Grammar
-![grammar-light-mode](https://raw.githubusercontent.com/david-prv/mini-ocaml/main/docs/grammar-light-mode.png#gh-light-mode-only)
-![grammar-dark-mode](https://raw.githubusercontent.com/david-prv/mini-ocaml/main/docs/grammar-dark.png#gh-dark-mode-only)
+```bnf
+<var> ::= string
+<cons> ::= B | N
+<type> ::= <cons>| <type> → <type>
+<operator> ::= ⊕ | ⊖ | ⊗ | ≤
+<expression> ::= <var> | <cons> | <expression> ∘ <expression> | <expression> <expression>
+                | IF <expression> THEN <expression> ELSE <expression>
+                | 𝜆<var>.<expression> | 𝜆<var>:<type>.<expression>
+                | LET <var> = <expression> IN <expression>
+                | LET REC <var> <var> = <expression> IN <expression>
+                | LET REC <var> (<var>:<type>) : <type> = <expression> IN <expression>
+```
