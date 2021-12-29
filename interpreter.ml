@@ -44,7 +44,18 @@ let rec lookup x (env : ('a,'b) env) =
                 
 (* LEXER / TOKENIZER *) 
 
-let rec verify_if t = true ;;
+let rec verify_if t = 
+  match t with
+  | [] -> false
+  | 't'::'h'::'e'::'n'::t -> begin
+      let rec verify_if' t =
+        match t with
+        | [] -> false
+        | 'e'::'l'::'s'::'e'::t -> true
+        | _ :: t -> verify_if' t
+      in verify_if' t
+    end
+  | _ :: t -> verify_if t
 let rec verify_let t = true ;;
 let rec verify_fun t= true ;;
 
