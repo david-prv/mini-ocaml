@@ -1,6 +1,5 @@
 (* TYPE DECLARATIONS *)
 
-type token = AT | BT | CT | LP | RP
 type ('a, 'b) env = ('a * 'b) list
 type var = string ;;
 type con = Bcon of bool | Icon of int 
@@ -24,6 +23,8 @@ type value = Bval of bool
            | Ival of int
            | Closure of var * exp * (var,value) env
            | Bclosure of var * var * exp * (var,value) env 
+type token = LP | RP | EQ | COL | ARR | LAM | ADD | SUB | MUL | LEQ
+           | IF | THEN | ELSE | LET | REC | IN | CON of con | VAR of string | BOOL | INT
   
 (* HELPER FUNCTIONS *)
 
@@ -42,6 +43,64 @@ let rec lookup x (env : ('a,'b) env) =
   | [] -> failwith "lookup: unbound value"
                 
 (* LEXER / TOKENIZER *) 
+
+let rec verify_if t = true ;;
+let rec verify_let t = true ;;
+let rec verify_fun t= true ;;
+
+let lex s =
+  let n = String.length s in
+  let explode s =
+    let rec explode' s i a =
+      if i = String.length s then a
+      else explode' s (i+1) (a @ [String.get s i])
+    in explode' s 0 [] in
+  let rec lex i l =
+    if i >= n then List.rev l
+    else match String.get s i with
+      | '+' -> lex (i+1) (ADD::l)
+      | '-' -> lex (i+1) (SUB::l)
+      | '*' -> lex (i+1) (MUL::l)
+      | '(' -> lex (i+1) (LP::l)
+      | ')' -> lex (i+1) (RP::l)
+      | ':' -> lex (i+1) (COL::l)
+      | '<' -> begin
+          match String.get s (i+1) with
+          | '=' -> lex (i+2) (LEQ::l)
+          | _ -> failwith "lex: syntax error"
+        end
+      | '=' -> lex (i+1) (EQ::l)
+      | ' ' | '\n' | '\t' -> lex (i+1) l
+      | _ -> begin 
+          let char_list = explode (String.sub s i ((String.length s) - i)) in
+          let rec lex_c cl tl i = match cl with
+            | [] -> failwith "lex: syntax error"
+            | 'i'::'f'::t -> begin
+                if verify_if t then
+                  lex (i+2) (IF::tl)
+                else
+                  failwith "lex: syntax error"
+              end
+            | 't'::'h'::'e'::'n'::t -> lex (i+4) (THEN::tl)
+            | 'e'::'l'::'s'::'e'::t -> lex (i+4) (ELSE::tl)
+            | 'f'::'u'::'n'::t -> begin
+                if verify_fun t then
+                  lex (i+3) (LAM::tl)
+                else
+                  failwith "lex: syntax error"
+              end  
+            | 'l'::'e'::'t'::t -> begin
+                if verify_let t then
+                  lex (i+3) (LET::tl)
+                else
+                  failwith "lex: syntax error"
+              end
+            | 'r'::'e'::'c'::t -> lex (i+3) (REC::tl)
+            | 'i'::'n'::t -> lex (i+2) (IN::tl)
+            | _ -> lex (i+1) tl
+          in lex_c char_list l i
+        end
+  in lex 0 [] ;;
 
 (* PARSER *)
 
@@ -102,8 +161,8 @@ and eval_op op v1 v2 = match op, v1, v2 with
   | Leq, Ival(i1), Ival(i2) -> Bval (i1 <= i2)
   | _ -> failwith "eval_op: unexpected value (maybe a closure?)"
 and eval_fun env ex1 ex2 = let v1 = (eval env ex1) in match v1 with
-  | Closure (x,e,env) -> eval (update env x (eval env ex2)) e
   | Bclosure (f,x,e,env) -> eval (update (update env f v1) x (eval env ex2)) e
+  | Closure (x,e,env) -> eval (update env x (eval env ex2)) e 
   | _ -> failwith "eval_fun: function does not take arguments (not a closure?)"
 and eval_if env v ex1 ex2 = match v with
   | Bval(true) -> eval env ex1
@@ -121,4 +180,4 @@ let exp_lam = (Lamty("x", Int, Oapp(Add, Var "x", Con(Icon 2)))) ;;
 let exp_lr = (Letrecty("f", "x", Int, Int, Oapp(Add, Var "x", Con(Icon 2)), Lamty("y", Int, Oapp(Add, Var "y", Con(Icon 2))))) ;;
 eval env exp'' ;; (* yields Ival 3 *)
 eval env exp_lam ;; (* yields closure (x,e,V) *)
-eval env' exp_lr ;; 
+eval env' exp_lr ;; (* yields bclosure (f,x,e,V) *)
