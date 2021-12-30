@@ -31,7 +31,7 @@ Small interpreter written in Meta-Language OCaml for Object-Language "Mini-OCaml
 ```
 
 ## Usage
-1. Download .SML file and run interpreter in any [OCaml environment](https://try.ocamlpro.com/)
+1. Download .SML file and run interpreter in any [OCaml environment](https://github.com/david-prv/mini-ocaml/blob/main/docs/environments.md)
 2. Use toplevel for commands
 3. Use following commands to run a mini-ocaml script:
 ```
