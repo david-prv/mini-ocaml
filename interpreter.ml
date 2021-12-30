@@ -39,7 +39,9 @@ let string2digit s =
 let empty : ('a, 'b) env = []
 let update (environment : ('a,'b) env) key value : ('a,'b) env =
   (key, value) :: environment
-                       
+        
+let fst (a, b) = a ;;  
+               
 let rec mem x l =
   match l with
   | [] -> false
@@ -50,6 +52,10 @@ let rec lookup x (env : ('a,'b) env) =
   | (key, value) :: t -> if key = x then value else lookup x t
   | [] -> failwith "lookup: unbound value"
                 
+let verify t l =  match l with
+  | [] -> failwith "verify: no list provided"
+  | t'::l -> if t'=t then l else failwith "verify: no match" 
+          
 (* LEXER / TOKENIZER *) 
 
 let rec verify_if t = 
@@ -166,8 +172,45 @@ let lex s =
 
 (* PARSER *)
 
-let rec parse s : exp = failwith "not done yet" ;;
-
+let rec parse (tl : token list) : exp * token list = 
+  match tl with
+  | IF::t -> let (b1, t) = parse t in
+      let (b2, t) = parse (verify THEN t) in
+      let (b3, t) = parse (verify ELSE t) in
+      (If(b1,b2,b3), t)
+  | LET::VAR x::EQ::t -> let (b1, t) = parse t in
+      let (b2, t) = parse (verify IN t) in
+      (Let(x,b1,b2), t)
+  | LET::REC::VAR f::VAR x::EQ::t ->  let (b1,t) = parse t in
+      let (b2,t) = parse (verify IN t) in
+      (Letrec (f,x,b1,b2),t)
+  | LAM::VAR x::EQ::t -> let (b1, t) = parse t in (Lam(x,b1), t)
+  | l -> cexp l
+and cexp (tl : token list) = let (b1,t) = sexp tl in cexp' b1 t
+and cexp' b1 (t : token list) = match t with
+  | LEQ::t -> let (b2,t) = sexp t in ( Oapp(Leq,b1,b2), t )
+  | l -> (b1, l)
+and sexp (tl : token list) = let (b1,t) = mexp tl in sexp' b1 t
+and sexp' b1 (t : token list) = match t with
+  | SUB::t -> let (b2,t) = mexp t in sexp' ( Oapp(Sub,b1,b2) ) t
+  | ADD::t -> let (b2,t) = mexp t in sexp' ( Oapp(Add,b1,b2) ) t 
+  | l -> (b1,l)
+and mexp (tl : token list) = let (b1,t) = aexp tl in mexp' b1 t
+and mexp' b1 (t : token list) = match t with
+  | MUL::t -> let (b2,t) = aexp t in aexp' (Oapp(Mul,b1,b2)) t
+  | l -> (b1,l)
+and aexp (tl : token list) = let (b1,t) = pexp tl in aexp' b1 t
+and aexp' b1 (t : token list) = match t with
+  | CON _ :: _ | VAR _ :: _ | LP :: _  ->
+      let (b2,t) = pexp t in aexp' (Fapp(b1,b2)) t
+  | l -> (b1,l)
+and pexp (tl : token list) = match tl with
+  | CON (Bcon b)::t -> (Con (Bcon b), t)
+  | CON (Icon n)::t -> (Con (Icon n), t)
+  | VAR x::t -> (Var x, t)
+  | LP::t -> let (b1,t) = parse t in (b1, verify RP t)
+  |  _ -> failwith "pexp"
+  
 (* TYPE CHECKER *)
 
 let rec check env exp : ty = 
@@ -235,8 +278,8 @@ and eval_if env v ex1 ex2 = match v with
 
 (* CHECKSTR & EVALSTR *)  
 
-let checkStr s = check empty (parse (lex s)) ;;
-let evalStr s = eval empty (parse (lex s)) ;;
+let checkStr s = check empty (fst(parse (lex s))) ;;
+let evalStr s = eval empty (fst(parse (lex s))) ;;
 
 (* TOPLEVEL *)
 
