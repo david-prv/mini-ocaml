@@ -209,7 +209,7 @@ and pexp (tl : token list) = match tl with
   | CON (Icon n)::t -> (Con (Icon n), t)
   | VAR x::t -> (Var x, t)
   | LP::t -> let (b1,t) = parse t in (b1, verify RP t)
-  | _ -> failwith "pexp"
+  | _ -> failwith "parse: unknown token"
   
 (* TYPE CHECKER *)
 
@@ -283,6 +283,7 @@ let evalStr s = eval empty (fst(parse (lex s))) ;;
 
 (* TOPLEVEL *)
 
+(*
 lex "let x = 1 in x" ;;
 lex "let x = if 1 <= 2 then 3 else 4 in x" ;;
 lex "let rec f x = if 1 <= 2 then 4 else 2 in f x" ;;
@@ -292,7 +293,7 @@ lex "let test123 = 1 in 1" ;;
 lex "let 1 = 1 in 1" ;; 
 lex "let test123=1 in test123" ;;
 lex  "let rec fac a = fun n ->
-    if n <= 1 then a else fac (n*a) (n-1) 
+if n <= 1 then a else fac (n*a) (n-1) 
 in fac 1 5" ;;
 lex "LeT x = 3 In x" ;;
 
@@ -300,7 +301,7 @@ eval empty (Let("f" , Lam("x", Oapp(Add, Var "x", Con(Icon 1))) , Fapp(Var "f", 
 check empty (Let("f" , Lam("x", Oapp(Add, Var "x", Con(Icon 1))) , Fapp(Var "f", Con(Icon 1)))) ;;
 eval empty (Let("x", Con(Icon 3), Var "x")) ;;
 
-(*let env = empty ;;
+let env = empty ;;
 let env' = empty ;;
 let exp = (Con(Icon 1)) ;;
 let exp' = (Var "x") ;;
@@ -310,4 +311,5 @@ let exp_lr = (Letrecty("f", "x", Int, Int, Oapp(Add, Var "x", Con(Icon 2)), Lamt
 eval env exp'' ;; (* yields Ival 3 *)
 eval env exp_lam ;; (* yields closure (x,e,V) *)
 eval env' exp_lr ;; (* yields bclosure (f,x,e,V) *)
-eval empty (Oapp(Leq,(Oapp(Add, Con(Icon 1), Con(Icon 3))), Con(Icon 5))) (* yields Bval true *)*)
+eval empty (Oapp(Leq,(Oapp(Add, Con(Icon 1), Con(Icon 3))), Con(Icon 5))) (* yields Bval true *)
+*)
