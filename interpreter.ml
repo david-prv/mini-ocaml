@@ -23,18 +23,18 @@ type value = Bval of bool
            | Ival of int
            | Closure of var * exp * (var,value) env
            | Bclosure of var * var * exp * (var,value) env 
-type token = LP | RP | EQ | COL | ARR | LAM | ADD | SUB | MUL | LEQ
+type token = LP | RP | EQ | COL | ARR | LAM | ADD | SUB | MUL | LEQ | TY of ty
            | IF | THEN | ELSE | LET | REC | IN | CON of con | VAR of string | BOOL | INT
   
 (* HELPER FUNCTIONS *)
 
-let string2digit s =
+let char2digit s =
   let s = String.make 1 s in
   match s with
   | "1" -> 1 | "4" -> 4 | "7" -> 7
   | "2" -> 2 | "5" -> 5 | "8" -> 8
   | "3" -> 3 | "6" -> 6 | "9" -> 9
-  | "0" -> 0 | _ -> failwith "string2digit: illegal character"
+  | _ -> failwith "char2digit: unknown character"
 
 let empty : ('a, 'b) env = []
 let update (environment : ('a,'b) env) key value : ('a,'b) env =
@@ -58,6 +58,11 @@ let verify t l =  match l with
           
 (* LEXER / TOKENIZER *) 
 
+let isSymbol c =
+  match c with
+  | '+' | '-' | '>' | '<' | '=' | '(' | ')' | ':' | '*' | ' ' -> true 
+  | _ -> false
+    
 let rec verify_if t = 
   match t with
   | [] -> false
@@ -76,6 +81,7 @@ let rec verify_let t =
   | [] -> false
   | 'r'::'e'::'c'::_::f::_::x::t -> verify_let' t 
   | _::x::_::'='::t -> verify_let' t
+  | _::x::'='::t -> verify_let' t
   | _ :: t -> verify_let t
 and verify_let' t =
   match t with
@@ -86,13 +92,17 @@ and verify_let' t =
 let rec verify_fun t =
   match t with
   | [] -> false
+  | _::x::_::':'::t -> verify_fun' t
+  | _::x::':'::t -> verify_fun' t
   | _::x::_::'-'::'>'::t -> true
+  | _::x::'-'::'>'::t -> true
   | _ -> false
-
-let isSymbol c =
-  match c with
-  | '+' | '-' | '>' | '<' | '=' | '(' | ')' | ':' | '*' | ' ' -> true 
-  | _ -> false
+and verify_fun' t =
+  match t with
+  | '-'::'>'::t -> true
+  | ')'::t -> verify_fun' t
+  | x::t -> verify_fun' t 
+  | [] -> false
 
 let rec makeVar t : int * string =
   let c = 0 in
@@ -122,7 +132,15 @@ let lex s =
       | '*' -> lex (i+1) (MUL::l)
       | '(' -> lex (i+1) (LP::l)
       | ')' -> lex (i+1) (RP::l)
-      | ':' -> lex (i+1) (COL::l)
+      | ':' -> begin
+          let char_list = explode(String.sub s i ((String.length s) - i)) in
+          let rec lex_ty cl tl i = match cl with
+            | 'i'::'n'::'t'::t -> lex (i+3) (COL::TY(Int)::tl)
+            | 'b'::'o'::'o'::'l'::t -> lex (i+4) (COL::TY(Bool)::tl)
+            | ' '::t -> lex_ty t tl (i+1)
+            | _ -> failwith "lex_ty: unknown syntax"
+          in lex_ty char_list l i
+        end
       | '<' -> begin
           match String.get s (i+1) with
           | '=' -> lex (i+2) (LEQ::l)
@@ -132,8 +150,8 @@ let lex s =
       | ' ' | '\n' | '\t' -> lex (i+1) l
       | _ -> begin 
           let char_list = explode (String.sub s i ((String.length s) - i)) in 
-          let rec lex_c cl tl i = match cl with
-            | [] -> failwith "lex: expression is not exhaustive"
+          let lex_c cl tl i = match cl with
+            | [] -> failwith "lex: expression is not exhaustive" 
             | 'i'::'f'::t -> begin
                 if verify_if t then
                   lex (i+2) (IF::tl)
@@ -162,7 +180,7 @@ let lex s =
             | 't'::'r'::'u'::'e'::t -> lex (i+4) (CON(Bcon true)::tl)
             | 'f'::'a'::'l'::'s'::'e'::t -> lex (i+5) (CON(Bcon false)::tl)
             | x :: t -> match x with
-              | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' -> lex (i+1) (CON(Icon(string2digit x))::tl)
+              | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' -> lex (i+1) (CON(Icon(char2digit x))::tl)
               | _ -> match t with 
                 | y::t -> let (j,str) = makeVar (x::y::t) in lex (i+j) (VAR(str)::tl) 
                 | _ -> lex (i+1) (VAR(String.make 1 x)::tl)
