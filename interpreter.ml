@@ -184,7 +184,7 @@ let rec parse (tl : token list) : exp * token list =
   | LET::REC::VAR f::VAR x::EQ::t ->  let (b1,t) = parse t in
       let (b2,t) = parse (verify IN t) in
       (Letrec (f,x,b1,b2),t)
-  | LAM::VAR x::EQ::t -> let (b1, t) = parse t in (Lam(x,b1), t)
+  | LAM::VAR x::ARR::t -> let (b1, t) = parse t in (Lam(x,b1), t)
   | t -> cexp t
 and cexp (tl : token list) = let (b1,t) = sexp tl in cexp' b1 t
 and cexp' b1 (t : token list) = match t with
