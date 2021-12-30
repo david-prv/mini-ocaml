@@ -159,8 +159,8 @@ let lex s =
                 match t with | 't'::t -> failwith "not yet done"
                              | _ -> lex (i+2) (IN::tl)
               end
-            | 't'::'r'::'u'::'e'::t -> lex (i+1) (CON(Bcon true)::tl)
-            | 'f'::'a'::'l'::'s'::'e'::t -> lex (i+1) (CON(Bcon false)::tl)
+            | 't'::'r'::'u'::'e'::t -> lex (i+4) (CON(Bcon true)::tl)
+            | 'f'::'a'::'l'::'s'::'e'::t -> lex (i+5) (CON(Bcon false)::tl)
             | x :: t -> match x with
               | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' -> lex (i+1) (CON(Icon(string2digit x))::tl)
               | _ -> match t with 
