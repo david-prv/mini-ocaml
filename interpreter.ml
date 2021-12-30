@@ -185,31 +185,31 @@ let rec parse (tl : token list) : exp * token list =
       let (b2,t) = parse (verify IN t) in
       (Letrec (f,x,b1,b2),t)
   | LAM::VAR x::EQ::t -> let (b1, t) = parse t in (Lam(x,b1), t)
-  | l -> cexp l
+  | t -> cexp t
 and cexp (tl : token list) = let (b1,t) = sexp tl in cexp' b1 t
 and cexp' b1 (t : token list) = match t with
   | LEQ::t -> let (b2,t) = sexp t in ( Oapp(Leq,b1,b2), t )
-  | l -> (b1, l)
+  | t -> (b1, t)
 and sexp (tl : token list) = let (b1,t) = mexp tl in sexp' b1 t
 and sexp' b1 (t : token list) = match t with
   | SUB::t -> let (b2,t) = mexp t in sexp' ( Oapp(Sub,b1,b2) ) t
   | ADD::t -> let (b2,t) = mexp t in sexp' ( Oapp(Add,b1,b2) ) t 
-  | l -> (b1,l)
+  | t -> (b1,t)
 and mexp (tl : token list) = let (b1,t) = aexp tl in mexp' b1 t
 and mexp' b1 (t : token list) = match t with
   | MUL::t -> let (b2,t) = aexp t in aexp' (Oapp(Mul,b1,b2)) t
-  | l -> (b1,l)
+  | t -> (b1,t)
 and aexp (tl : token list) = let (b1,t) = pexp tl in aexp' b1 t
 and aexp' b1 (t : token list) = match t with
   | CON _ :: _ | VAR _ :: _ | LP :: _  ->
       let (b2,t) = pexp t in aexp' (Fapp(b1,b2)) t
-  | l -> (b1,l)
+  | t -> (b1,t)
 and pexp (tl : token list) = match tl with
   | CON (Bcon b)::t -> (Con (Bcon b), t)
   | CON (Icon n)::t -> (Con (Icon n), t)
   | VAR x::t -> (Var x, t)
   | LP::t -> let (b1,t) = parse t in (b1, verify RP t)
-  |  _ -> failwith "pexp"
+  | _ -> failwith "pexp"
   
 (* TYPE CHECKER *)
 
