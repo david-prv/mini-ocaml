@@ -3,5 +3,5 @@
 ## TryOcaml (Browser Based)
 [try.ocamlpro.org](https://try.ocamlpro.org)
 
-## Ocaml-Top (Win Desktop)
+## Ocaml-Top (Cross-Platform Desktop)
 [Git Release](https://github.com/OCamlPro/ocaml-top/releases)
