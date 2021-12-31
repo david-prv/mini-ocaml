@@ -11,11 +11,12 @@ Small interpreter written in Meta-Language OCaml for Object-Language "Mini-OCaml
     * [Workflow](https://github.com/david-prv/mini-ocaml#workflow) 
 
 ## ToDo Features:
-- [ ] Lexer / Tokenizer
-- [ ] Parser
+- [x] Lexer / Tokenizer
+- [x] Parser
 - [x] Check for free Vars
 - [x] Type Checking / Guessing
 - [x] Evaluation
+- [ ] Advanced types: float, string, ...
 
 ## Abstract Grammar
 ```bnf
