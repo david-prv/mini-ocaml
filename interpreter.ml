@@ -299,7 +299,7 @@ and eval_if env v ex1 ex2 = match v with
   | Bval(false) -> eval env ex2
   | _ -> failwith "eval_if: unexpected value (maybe a closure?)"
 
-(* CHECKSTR & EVALSTR *)  
+(* TOP-LEVEL COMMANDS *)  
 
 let checkStr s = check empty (fst(parse (lex s))) ;;
 let evalStr s = eval empty (fst(parse (lex s))) ;;
