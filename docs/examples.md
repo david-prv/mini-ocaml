@@ -1,5 +1,7 @@
 # Examples
 
+Attention: ``checkStr`` will complain bitterly in case you give it an un-typed expression for lambda or let-rec expressions!
+
 ## Let
 ```ocaml
 evalStr "let x = if 3 <= 4 then true else false in x" ;;
