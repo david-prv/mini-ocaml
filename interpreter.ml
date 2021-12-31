@@ -174,7 +174,7 @@ let lex s =
               end
             | 'r'::'e'::'c'::t -> lex (i+3) (REC::tl)
             | 'i'::'n'::t -> begin 
-                match t with | 't'::t -> failwith "not yet done"
+                match t with | 't'::t -> failwith "lex: 'int' is a type, not a keyword"
                              | _ -> lex (i+2) (IN::tl)
               end
             | 't'::'r'::'u'::'e'::t -> lex (i+4) (CON(Bcon true)::tl)
