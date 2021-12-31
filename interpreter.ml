@@ -302,5 +302,5 @@ and eval_if env v ex1 ex2 = match v with
 (* TOP-LEVEL COMMANDS *)  
 
 let env = empty ;;
-let checkStr s = check env (fst(parse (lex s))) ;;
+let checkStr s = check empty (fst(parse (lex s))) ;;
 let evalStr s = eval env (fst(parse (lex s))) ;;
