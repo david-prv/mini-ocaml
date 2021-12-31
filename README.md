@@ -4,8 +4,9 @@ Small interpreter written in Meta-Language OCaml for Object-Language "Mini-OCaml
 ## Table of contents
 1. [ToDo Features](https://github.com/david-prv/mini-ocaml#todo-features)
 2. [Abstract Grammar](https://github.com/david-prv/mini-ocaml#abstract-grammar)
-3. [Usage & Examples](https://github.com/david-prv/mini-ocaml#usage)
-4. [How does it work](https://github.com/david-prv/mini-ocaml#how-does-it-work)
+3. [Usage](https://github.com/david-prv/mini-ocaml#usage)
+    * [Working Examples](https://github.com/david-prv/mini-ocaml#working-examples)
+5. [How does it work](https://github.com/david-prv/mini-ocaml#how-does-it-work)
     * [4 Layers](https://github.com/david-prv/mini-ocaml#4-layers) 
     * [Workflow](https://github.com/david-prv/mini-ocaml#workflow) 
 
@@ -31,41 +32,55 @@ Small interpreter written in Meta-Language OCaml for Object-Language "Mini-OCaml
 ```
 
 ## Usage
-1. Download .ML file and run interpreter in any [OCaml environment](https://github.com/david-prv/mini-ocaml/blob/main/docs/environments.md)
-2. Use toplevel for commands
-3. Use following commands to run a mini-ocaml script:
+First, you'll need to download the .ML file and run interpreter in any [OCaml environment](https://github.com/david-prv/mini-ocaml/blob/main/docs/environments.md)!
+The following commands will be our top-level commands:
 ```
 checkStr : string → type
 evalStr : string → value
 ```
-4. Some examples:
+### Working examples
+#### Simple let expression
 ```ocaml
-(* simple let expression *)
 let input = "let x = 3 in x" ;;
 checkStr input ;;
 evalStr input ;;
-
-(* if-structure *)
+```
+#### If expression
+```ocaml
 let input = "let x = if 3 <= 4 then true else false in x" ;;
 checkStr input ;;
 evalStr input ;;
-
-(* recursive expression *)
+```
+#### Recursive expression
+```ocaml
 let input = "let rec f x = if x <= 4 then f (x-1) else false in x" ;;
 checkStr input ;;
 evalStr input ;;
-
-(* more complex recursive expression *)
+```
+#### Complex recursive expression
+```ocaml
 let input = "let rec fac a = fun n ->
     if n <= 1 then a else fac (n*a) (n-1) 
    in fac 1 5" ;;
 checkStr input ;;
 evalStr input ;;
-
-(* lambda expression *)
+```
+#### Lambda expression
+```ocaml
 let input = "let f = fun x -> x + 1 in f 1" ;;
 checkStr input ;;
 evalStr input ;;
+```
+#### Typed recursive expressions
+```ocaml
+let input1 = "let f = fun x : Int -> x + 1 in f 1" ;;
+let input2 = "let rec f (x : Int) : Int = if 1 <= 2 then 4 else 2 in f x" ;;
+
+checkStr input1 ;;
+checkStr input2 ;;
+
+evalStr input1 ;;
+evalStr input2 ;;
 ```
 
 ## How does it work
