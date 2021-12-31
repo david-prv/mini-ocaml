@@ -39,48 +39,51 @@ checkStr : string → type
 evalStr : string → value
 ```
 ### Working examples
-#### Simple let expression
+#### - Simple let expression
 ```ocaml
 let input = "let x = 3 in x" ;;
 checkStr input ;;
 evalStr input ;;
 ```
-#### If expression
+Result:
+```ocaml
+- : ty = Int
+- : value = Ival 3
+```
+#### - If expression
 ```ocaml
 let input = "let x = if 3 <= 4 then true else false in x" ;;
 checkStr input ;;
 evalStr input ;;
 ```
-#### Recursive expression
+Result:
 ```ocaml
-let input = "let rec f x = if x <= 4 then f (x-1) else false in x" ;;
+- : ty = Bool
+- : value = Bval true
+```
+#### - Recursive expression
+```ocaml
+let input = "let rec fac (a : Int) : Int = fun n ->
+if n <= 1 then a else fac (n*a) (n-1) 
+in fac 1 5" ;;
 checkStr input ;;
 evalStr input ;;
 ```
-#### Complex recursive expression
+Result:
 ```ocaml
-let input = "let rec fac a = fun n ->
-    if n <= 1 then a else fac (n*a) (n-1) 
-   in fac 1 5" ;;
+- : ty = Arrow (Int, Arrow (Int, Int))
+- : value = Ival 120
+```
+#### - Lambda expression
+```ocaml
+let input = "let f = fun x : Int -> x + 1 in f 1" ;;
 checkStr input ;;
 evalStr input ;;
 ```
-#### Lambda expression
+Result:
 ```ocaml
-let input = "let f = fun x -> x + 1 in f 1" ;;
-checkStr input ;;
-evalStr input ;;
-```
-#### Typed recursive expressions
-```ocaml
-let input1 = "let f = fun x : Int -> x + 1 in f 1" ;;
-let input2 = "let rec f (x : Int) : Int = if 1 <= 2 then 4 else 2 in f x" ;;
-
-checkStr input1 ;;
-checkStr input2 ;;
-
-evalStr input1 ;;
-evalStr input2 ;;
+- : ty = Arrow (Int, Int)
+- : value = Ival 2
 ```
 
 See more examples [here](https://github.com/david-prv/mini-ocaml/blob/main/docs/examples.md).
