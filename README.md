@@ -83,6 +83,8 @@ evalStr input1 ;;
 evalStr input2 ;;
 ```
 
+See more examples [here](https://github.com/david-prv/mini-ocaml/blob/main/docs/examples.md).
+
 ## How does it work
 ### 4 Layers
 The interpreter is divided in 4 layers:
