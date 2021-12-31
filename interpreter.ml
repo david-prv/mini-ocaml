@@ -202,6 +202,10 @@ let rec parse (tl : token list) : exp * token list =
   | LET::REC::VAR f::VAR x::EQ::t ->  let (b1,t) = parse t in
       let (b2,t) = parse (verify IN t) in
       (Letrec (f,x,b1,b2),t)
+  | LET::REC::VAR f::LP::VAR x::COL::TY t1::RP::COL::TY t2::EQ::t -> let (b1,t) = parse t in
+      let (b2,t) = parse (verify IN t) in
+      (Letrecty (f,x,t1,t2,b1,b2), t)
+  | LAM::VAR x::COL::TY t1::ARR::t -> let (b1,t) = parse t in (Lamty(x,t1,b1), t)
   | LAM::VAR x::ARR::t -> let (b1, t) = parse t in (Lam(x,b1), t)
   | t -> cexp t
 and cexp (tl : token list) = let (b1,t) = sexp tl in cexp' b1 t
@@ -248,9 +252,10 @@ let rec check env exp : ty =
   | Letrec(f,x,ex1,ex2) -> failwith "check: missing let rec type"
   | Letrecty(f,x,ty1,ty2,ex1,ex2) -> Arrow(ty1, check (update env f (Arrow(ty1, ty2))) ex2)
 and check_oapp op x1_ty x2_ty =
-  match x1_ty, x2_ty with
-  | Int, Int -> Arrow(x1_ty, x2_ty)
-  | _, _ -> failwith "check_oapp: operation is ill-typed"
+  match x1_ty, x2_ty, op with
+  | Int, Int, Leq -> Bool
+  | Int, Int, _ -> Int
+  | _, _, _ -> failwith "check_oapp: operation is ill-typed"
 and check_fapp fun_ty exp_ty =
   match fun_ty with
   | Arrow(Int,t2) -> if exp_ty = Int then fun_ty else failwith "check_fapp: expression has unexpected type"
@@ -259,8 +264,8 @@ and check_fapp fun_ty exp_ty =
 and check_if ex1_ty ex2_ty ex3_ty =
   if ex1_ty = Bool then
     if ex2_ty = ex3_ty then ex2_ty
-    else failwith "check_if: If is ill-typed"
-  else failwith "check_if: If is ill-typed"
+    else failwith "check_if: 'if' is ill-typed"
+  else failwith "check_if: 'if' condition has to be type bool"
     
 
 (* EVALUATION *)
@@ -298,39 +303,3 @@ and eval_if env v ex1 ex2 = match v with
 
 let checkStr s = check empty (fst(parse (lex s))) ;;
 let evalStr s = eval empty (fst(parse (lex s))) ;;
-
-(* TOPLEVEL *)
-
-lex "let f = fun x : Int -> x + 1 in f 1" ;;
-lex "let rec f (x : Int) : Int = if 1 <= 2 then 4 else 2 in f x" ;;
-
-(*
-lex "let x = 1 in x" ;;
-lex "let x = if 1 <= 2 then 3 else 4 in x" ;;
-lex "let rec f x = if 1 <= 2 then 4 else 2 in f x" ;;
-lex "let f = fun x -> x + 1 in f 1" ;;
-lex "let omega = fun x -> x x in omega omega" ;; 
-lex "let test123 = 1 in 1" ;;
-lex "let 1 = 1 in 1" ;; 
-lex "let test123=1 in test123" ;;
-lex  "let rec fac a = fun n ->
-if n <= 1 then a else fac (n*a) (n-1) 
-in fac 1 5" ;;
-lex "LeT x = 3 In x" ;;
-
-eval empty (Let("f" , Lam("x", Oapp(Add, Var "x", Con(Icon 1))) , Fapp(Var "f", Con(Icon 1)))) ;;
-check empty (Let("f" , Lam("x", Oapp(Add, Var "x", Con(Icon 1))) , Fapp(Var "f", Con(Icon 1)))) ;;
-eval empty (Let("x", Con(Icon 3), Var "x")) ;;
-
-let env = empty ;;
-let env' = empty ;;
-let exp = (Con(Icon 1)) ;;
-let exp' = (Var "x") ;;
-let exp'' = (Oapp(Add, Con(Icon 1), Con(Icon 2))) ;;
-let exp_lam = (Lamty("x", Int, Oapp(Add, Var "x", Con(Icon 2)))) ;; 
-let exp_lr = (Letrecty("f", "x", Int, Int, Oapp(Add, Var "x", Con(Icon 2)), Lamty("y", Int, Oapp(Add, Var "y", Con(Icon 2))))) ;;
-eval env exp'' ;; (* yields Ival 3 *)
-eval env exp_lam ;; (* yields closure (x,e,V) *)
-eval env' exp_lr ;; (* yields bclosure (f,x,e,V) *)
-eval empty (Oapp(Leq,(Oapp(Add, Con(Icon 1), Con(Icon 3))), Con(Icon 5))) (* yields Bval true *)
-*)
