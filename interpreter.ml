@@ -99,8 +99,7 @@ let rec verify_fun t =
   | _ -> false
 and verify_fun' t =
   match t with
-  | '-'::'>'::t -> true
-  | ')'::t -> verify_fun' t
+  | '-'::'>'::t -> true 
   | x::t -> verify_fun' t 
   | [] -> false
 
@@ -135,10 +134,11 @@ let lex s =
       | ':' -> begin
           let char_list = explode(String.sub s i ((String.length s) - i)) in
           let rec lex_ty cl tl i = match cl with
-            | 'i'::'n'::'t'::t -> lex (i+3) (COL::TY(Int)::tl)
-            | 'b'::'o'::'o'::'l'::t -> lex (i+4) (COL::TY(Bool)::tl)
+            | 'i'::'n'::'t'::t -> lex (i+3) (TY(Int)::COL::tl)
+            | 'b'::'o'::'o'::'l'::t -> lex (i+4) (TY(Bool)::COL::tl)
             | ' '::t -> lex_ty t tl (i+1)
-            | _ -> failwith "lex_ty: unknown syntax"
+            | _ :: t -> lex_ty t tl (i+1)
+            | [] -> failwith "lex: type syntax error"
           in lex_ty char_list l i
         end
       | '<' -> begin
@@ -300,6 +300,9 @@ let checkStr s = check empty (fst(parse (lex s))) ;;
 let evalStr s = eval empty (fst(parse (lex s))) ;;
 
 (* TOPLEVEL *)
+
+lex "let f = fun x : Int -> x + 1 in f 1" ;;
+lex "let rec f (x : Int) : Int = if 1 <= 2 then 4 else 2 in f x" ;;
 
 (*
 lex "let x = 1 in x" ;;
