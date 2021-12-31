@@ -274,7 +274,7 @@ let rec eval env exp : value =
       | Icon(i) -> Ival i
     end
   | Oapp(op,ex1,ex2) -> eval_op op (eval env ex1) (eval env ex2)
-  | Fapp(ex1,ex2) -> eval_fun env ex1 ex2
+  | Fapp(ex1,ex2) -> eval_fun (eval env ex1) (eval env ex2)
   | If(ex1,ex2,ex3) -> eval_if env (eval env ex1) ex2 ex3
   | Lam(x,exp) | Lamty(x,_,exp) -> Closure (x,exp,env)
   | Let(x,ex1,ex2) -> eval (update env x (eval env ex1)) ex2
@@ -285,9 +285,9 @@ and eval_op op v1 v2 = match op, v1, v2 with
   | Mul, Ival(i1), Ival(i2) -> Ival (i1 * i2)
   | Leq, Ival(i1), Ival(i2) -> Bval (i1 <= i2)
   | _ -> failwith "eval_op: unexpected value (maybe a closure?)"
-and eval_fun env ex1 ex2 = let v1 = (eval env ex1) in match v1 with
-  | Bclosure (f,x,e,env) -> eval (update (update env f v1) x (eval env ex2)) e
-  | Closure (x,e,env) -> eval (update env x (eval env ex2)) e 
+and eval_fun v1 v2 = match v1 with
+  | Closure (x,e,env) -> eval (update env x v2) e
+  | Bclosure (f,x,e,env) -> eval (update (update env f v1) x v2) e
   | _ -> failwith "eval_fun: function does not take arguments (not a closure?)"
 and eval_if env v ex1 ex2 = match v with
   | Bval(true) -> eval env ex1
