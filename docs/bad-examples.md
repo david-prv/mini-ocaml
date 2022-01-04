@@ -18,10 +18,13 @@ Exception: (Failure "eval_fun: function does not take arguments")
 ## Illegal operators
 ```ocaml
 evalStr "1 + false" ;;
+evalStr "-1" ;;
+evalStr "1 +" ;;
 ```
 Exception:
 ```ocaml
 Exception: (Failure "eval_op: unexpected value")
+...
 ```
 
 ## Free Variables
