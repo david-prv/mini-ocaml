@@ -2,6 +2,16 @@
 
 Attention: ``checkStr`` will complain bitterly in case you give it an un-typed expression for lambda or let-rec expressions!
 
+Table of Contents:
+* [Let](#let)
+* [Let Rec Typed](#let-rec-typed)
+* [Let Rec Untyped](#let-rec-un-typed)
+* [Lambda Typed](#lam-typed)
+* [Lambda Untyped](#lam-un-typed)
+* [Comments](#comments)
+* [Closures](#closures)
+* [Shadowing](#shadowing)
+
 ## Let
 ```ocaml
 evalStr "let x = if 3 <= 4 then true else false in x" ;;
@@ -31,18 +41,18 @@ Result:
 - : value = Ival 4
 ```
 
-## Lam (un-typed)
+## Lam (typed)
 ```ocaml
-evalStr "let f = fun x -> if x <= 3 then true else false in f 2" ;;
+evalStr "let f = fun x : Int -> if x <= 3 then true else false in f 2" ;;
 ```
 Result:
 ```ocaml
 - : value = Bval True
 ```
 
-## Lam (typed)
+## Lam (un-typed)
 ```ocaml
-evalStr "let f = fun x : Int -> if x <= 3 then true else false in f 2" ;;
+evalStr "let f = fun x -> if x <= 3 then true else false in f 2" ;;
 ```
 Result:
 ```ocaml
