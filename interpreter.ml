@@ -259,7 +259,7 @@ and pexp (tl : token list) = match tl with
   | CON (Icon n)::t -> (Con (Icon n), t)
   | VAR x::t -> (Var x, t)
   | LP::t -> let (b1,t) = exp t in (b1, verify RP t)
-  | _ -> failwith "exp: unknown token"
+  | _ -> failwith "exp: unexpected token"
   
 (* ------ TYPE CHECKER ------ *)
 
