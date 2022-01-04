@@ -98,7 +98,8 @@ Result:
 - : value = Ival 2
 ```
 
-See more examples [here](https://github.com/david-prv/mini-ocaml/blob/main/docs/examples.md).
+See more examples [here](https://github.com/david-prv/mini-ocaml/blob/main/docs/examples.md).  
+See some **bad** examples [here](https://github.com/david-prv/mini-ocaml/blob/main/docs/bad-examples.md).
 
 ## How does it work
 ### 4 Layers
