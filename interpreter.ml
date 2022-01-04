@@ -317,15 +317,15 @@ and eval_op op v1 v2 = match op, v1, v2 with
   | Sub, Ival(i1), Ival(i2) -> Ival (i1 - i2)
   | Mul, Ival(i1), Ival(i2) -> Ival (i1 * i2)
   | Leq, Ival(i1), Ival(i2) -> Bval (i1 <= i2)
-  | _ -> failwith "eval_op: unexpected value (maybe a closure?)"
+  | _ -> failwith "eval_op: unexpected value"
 and eval_fun v1 v2 = match v1 with
   | Closure (x,e,env) -> eval (update env x v2) e
   | Bclosure (f,x,e,env) -> eval (update (update env f v1) x v2) e
-  | _ -> failwith "eval_fun: function does not take arguments (not a closure?)"
+  | _ -> failwith "eval_fun: function does not take arguments"
 and eval_if env v ex1 ex2 = match v with
   | Bval(true) -> eval env ex1
   | Bval(false) -> eval env ex2
-  | _ -> failwith "eval_if: unexpected value (maybe a closure?)"
+  | _ -> failwith "eval_if: unexpected value"
 
 (* ------ TOP-LEVEL COMMANDS ------ *)  
 
