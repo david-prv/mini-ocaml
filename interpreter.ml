@@ -190,23 +190,23 @@ let lex s =
 
 (* PARSER *)
 
-let rec parse (tl : token list) : exp * token list = 
+let rec exp (tl : token list) : exp * token list = 
   match tl with
-  | IF::t -> let (b1, t) = parse t in
-      let (b2, t) = parse (verify THEN t) in
-      let (b3, t) = parse (verify ELSE t) in
+  | IF::t -> let (b1, t) = exp t in
+      let (b2, t) = exp (verify THEN t) in
+      let (b3, t) = exp (verify ELSE t) in
       (If(b1,b2,b3), t)
-  | LET::VAR x::EQ::t -> let (b1, t) = parse t in
-      let (b2, t) = parse (verify IN t) in
+  | LET::VAR x::EQ::t -> let (b1, t) = exp t in
+      let (b2, t) = exp (verify IN t) in
       (Let(x,b1,b2), t)
-  | LET::REC::VAR f::VAR x::EQ::t ->  let (b1,t) = parse t in
-      let (b2,t) = parse (verify IN t) in
+  | LET::REC::VAR f::VAR x::EQ::t ->  let (b1,t) = exp t in
+      let (b2,t) = exp (verify IN t) in
       (Letrec (f,x,b1,b2),t)
-  | LET::REC::VAR f::LP::VAR x::COL::TY t1::RP::COL::TY t2::EQ::t -> let (b1,t) = parse t in
-      let (b2,t) = parse (verify IN t) in
+  | LET::REC::VAR f::LP::VAR x::COL::TY t1::RP::COL::TY t2::EQ::t -> let (b1,t) = exp t in
+      let (b2,t) = exp (verify IN t) in
       (Letrecty (f,x,t1,t2,b1,b2), t)
-  | LAM::VAR x::COL::TY t1::ARR::t -> let (b1,t) = parse t in (Lamty(x,t1,b1), t)
-  | LAM::VAR x::ARR::t -> let (b1, t) = parse t in (Lam(x,b1), t)
+  | LAM::VAR x::COL::TY t1::ARR::t -> let (b1,t) = exp t in (Lamty(x,t1,b1), t)
+  | LAM::VAR x::ARR::t -> let (b1, t) = exp t in (Lam(x,b1), t)
   | t -> cexp t
 and cexp (tl : token list) = let (b1,t) = sexp tl in cexp' b1 t
 and cexp' b1 (t : token list) = match t with
@@ -230,8 +230,8 @@ and pexp (tl : token list) = match tl with
   | CON (Bcon b)::t -> (Con (Bcon b), t)
   | CON (Icon n)::t -> (Con (Icon n), t)
   | VAR x::t -> (Var x, t)
-  | LP::t -> let (b1,t) = parse t in (b1, verify RP t)
-  | _ -> failwith "parse: unknown token"
+  | LP::t -> let (b1,t) = exp t in (b1, verify RP t)
+  | _ -> failwith "exp: unknown token"
   
 (* TYPE CHECKER *)
 
@@ -302,5 +302,5 @@ and eval_if env v ex1 ex2 = match v with
 (* TOP-LEVEL COMMANDS *)  
 
 let env = empty ;;
-let checkStr s = check empty (fst(parse (lex s))) ;;
-let evalStr s = eval env (fst(parse (lex s))) ;;
+let checkStr s = check empty (fst(exp (lex s))) ;;
+let evalStr s = eval env (fst(exp (lex s))) ;;
