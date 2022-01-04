@@ -111,7 +111,7 @@ let rec makeVar t : int * string =
     | x::t -> if isSymbol x then (count,akku) else makeVar' (count+1) t (akku ^ (String.make 1 x)) 
   in makeVar' c t ""    
 
-let lex s =
+let lex (s : string) =
   let n = String.length s in
   let s = String.lowercase_ascii s in
   let explode s =
