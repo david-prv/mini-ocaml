@@ -51,7 +51,7 @@ Result:
 - : ty = Int
 - : value = Ival 3
 ```
-#### Comments
+#### - Comments
 ```ocaml
 let input = "let x (* test 1 *) = 3 in x (* test 2 *)" ;;
 checkStr input ;;
