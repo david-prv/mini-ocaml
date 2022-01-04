@@ -23,7 +23,7 @@ type value = Bval of bool
            | Ival of int
            | Closure of var * exp * (var,value) env
            | Bclosure of var * var * exp * (var,value) env 
-type token = LP | RP | EQ | COL | ARR | LAM | ADD | SUB | MUL | LEQ | TY of ty
+type token = CO | CC | LP | RP | EQ | COL | ARR | LAM | ADD | SUB | MUL | LEQ | TY of ty
            | IF | THEN | ELSE | LET | REC | IN | CON of con | VAR of string | BOOL | INT
   
 (* HELPER FUNCTIONS *)
@@ -128,8 +128,16 @@ let lex s =
           | '>' -> lex (i+2) (ARR::l)
           | _ -> lex (i+1) (SUB::l)
         end
-      | '*' -> lex (i+1) (MUL::l)
-      | '(' -> lex (i+1) (LP::l)
+      | '*' -> begin
+          match String.get s (i+1) with
+          | ')' -> lex (i+2) (CC::l)
+          | _ -> lex (i+1) (MUL::l)
+        end
+      | '(' -> begin
+          match String.get s (i+1) with
+          | '*' -> lex (i+2) (CO::l)
+          | _ -> lex (i+1) (LP::l)
+        end
       | ')' -> lex (i+1) (RP::l)
       | ':' -> begin
           let char_list = explode(String.sub s i ((String.length s) - i)) in
@@ -190,8 +198,28 @@ let lex s =
 
 (* PARSER *)
 
-let rec exp (tl : token list) : exp * token list = 
+let rec skip (tl : token list) (akku : token list) : token list =
   match tl with
+  | CO::l -> begin
+      let rec skip' l =
+        match l with
+        | CC::l -> begin
+            let rec close l =
+              match l with
+              | CC::l -> close l
+              | x::l -> x::l
+              | [] -> []
+            in close l
+          end
+        | x::l -> skip' l
+        | [] -> failwith "skip: comment not closed"
+      in skip (skip' l) akku
+    end
+  | x::l -> skip l ([x] @ akku)
+  | [] -> List.rev akku
+
+let rec exp (tl : token list) : exp * token list = 
+  match tl with 
   | IF::t -> let (b1, t) = exp t in
       let (b2, t) = exp (verify THEN t) in
       let (b3, t) = exp (verify ELSE t) in
@@ -302,5 +330,5 @@ and eval_if env v ex1 ex2 = match v with
 (* TOP-LEVEL COMMANDS *)  
 
 let env = empty ;;
-let checkStr s = check empty (fst(exp (lex s))) ;;
-let evalStr s = eval env (fst(exp (lex s))) ;;
+let checkStr s = check empty (fst(exp (skip(lex s) []))) ;;
+let evalStr s = eval env (fst(exp (skip(lex s) []))) ;;
