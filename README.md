@@ -53,6 +53,17 @@ Result:
 - : ty = Int
 - : value = Ival 3
 ```
+#### Comments
+```ocaml
+let input = "let x (* test 1 *) = 3 in x (* test 2 *)" ;;
+checkStr input ;;
+evalStr input ;;
+```
+Result:
+```ocaml
+- : ty = Int
+- : value = Ival 3
+```
 #### - If expression
 ```ocaml
 let input = "let x = if 3 <= 4 then true else false in x" ;;
