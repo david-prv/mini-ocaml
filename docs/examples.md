@@ -57,3 +57,22 @@ Result:
 ```ocaml
 - : value = Ival 1
 ```
+
+## Closures
+```ocaml
+evalStr "let f = fun x -> x * 2 in f" ;;
+```
+Result:
+```ocaml
+- : value = Closure ("x", Oapp (Mul, Var "x", Con (Icon 2)), [])
+```
+
+## Shadowing
+```ocaml
+evalStr "let f = fun x -> x * 2 in let g = f in g" ;;
+```
+Shadowing function ``f`` (takes ``x`` as argument) with ``g``.  
+Result:
+```ocaml
+- : value = Closure ("x", Oapp (Mul, Var "x", Con (Icon 2)), [])
+```
