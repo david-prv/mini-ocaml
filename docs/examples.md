@@ -46,5 +46,14 @@ evalStr "let f = fun x : Int -> if x <= 3 then true else false in f 2" ;;
 ```
 Result:
 ```ocaml
-- : ty = Bval True
+- : value = Bval True
+```
+
+## Comments
+```ocaml
+evalStr "let x = 1 (* this is a comment *) in x (* this is another comment *)" ;;
+```
+Result:
+```ocaml
+- : value = Ival 1
 ```
