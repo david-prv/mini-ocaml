@@ -1,4 +1,4 @@
-(* TYPE DECLARATIONS *)
+(* ------ TYPE DECLARATIONS ------ *)
 
 type ('a, 'b) env = ('a * 'b) list
 type var = string ;;
@@ -26,7 +26,7 @@ type value = Bval of bool
 type token = CO | CC | LP | RP | EQ | COL | ARR | LAM | ADD | SUB | MUL | LEQ | TY of ty
            | IF | THEN | ELSE | LET | REC | IN | CON of con | VAR of string | BOOL | INT
   
-(* HELPER FUNCTIONS *)
+(* ------ HELPER FUNCTIONS ------ *)
 
 let char2digit s =
   let s = String.make 1 s in
@@ -56,12 +56,40 @@ let verify t l =  match l with
   | [] -> failwith "verify: no list provided"
   | t'::l -> if t'=t then l else failwith "verify: no match" 
           
-(* LEXER / TOKENIZER *) 
-
 let isSymbol c =
   match c with
   | '+' | '-' | '>' | '<' | '=' | '(' | ')' | ':' | '*' | ' ' -> true 
   | _ -> false
+    
+let rec makeVar t : int * string =
+  let c = 0 in
+  let rec makeVar' count t akku : int * string =
+    match t with
+    | [] -> (count, akku) 
+    | x::t -> if isSymbol x then (count,akku) else makeVar' (count+1) t (akku ^ (String.make 1 x)) 
+  in makeVar' c t ""   
+    
+let rec skip (tl : token list) (akku : token list) : token list =
+  match tl with
+  | CO::l -> begin
+      let rec skip' l =
+        match l with
+        | CC::l -> begin
+            let rec close l =
+              match l with
+              | CC::l -> close l
+              | x::l -> x::l
+              | [] -> []
+            in close l
+          end
+        | x::l -> skip' l
+        | [] -> failwith "skip: comment not closed"
+      in skip (skip' l) akku
+    end
+  | x::l -> skip l ([x] @ akku)
+  | [] -> List.rev akku
+          
+(* ------ LEXER / TOKENIZER ------ *) 
     
 let rec verify_if t = 
   match t with
@@ -101,15 +129,7 @@ and verify_fun' t =
   match t with
   | '-'::'>'::t -> true 
   | x::t -> verify_fun' t 
-  | [] -> false
-
-let rec makeVar t : int * string =
-  let c = 0 in
-  let rec makeVar' count t akku : int * string =
-    match t with
-    | [] -> (count, akku) 
-    | x::t -> if isSymbol x then (count,akku) else makeVar' (count+1) t (akku ^ (String.make 1 x)) 
-  in makeVar' c t ""    
+  | [] -> false 
 
 let lex (s : string) =
   let n = String.length s in
@@ -196,27 +216,7 @@ let lex (s : string) =
         end
   in lex 0 [] ;;
 
-(* PARSER *)
-
-let rec skip (tl : token list) (akku : token list) : token list =
-  match tl with
-  | CO::l -> begin
-      let rec skip' l =
-        match l with
-        | CC::l -> begin
-            let rec close l =
-              match l with
-              | CC::l -> close l
-              | x::l -> x::l
-              | [] -> []
-            in close l
-          end
-        | x::l -> skip' l
-        | [] -> failwith "skip: comment not closed"
-      in skip (skip' l) akku
-    end
-  | x::l -> skip l ([x] @ akku)
-  | [] -> List.rev akku
+(* ------ PARSER ------ *) 
 
 let rec exp (tl : token list) : exp * token list = 
   match tl with 
@@ -261,7 +261,7 @@ and pexp (tl : token list) = match tl with
   | LP::t -> let (b1,t) = exp t in (b1, verify RP t)
   | _ -> failwith "exp: unknown token"
   
-(* TYPE CHECKER *)
+(* ------ TYPE CHECKER ------ *)
 
 let rec check env exp : ty = 
   match exp with
@@ -296,7 +296,7 @@ and check_if ex1_ty ex2_ty ex3_ty =
   else failwith "check_if: 'if' condition has to be type bool"
     
 
-(* EVALUATION *)
+(* ------ EVALUATION ------ *)
 
 let rec eval env exp : value =
   match exp with
@@ -327,7 +327,7 @@ and eval_if env v ex1 ex2 = match v with
   | Bval(false) -> eval env ex2
   | _ -> failwith "eval_if: unexpected value (maybe a closure?)"
 
-(* TOP-LEVEL COMMANDS *)  
+(* ------ TOP-LEVEL COMMANDS ------ *)  
 
 let env = empty ;;
 let checkStr s = check empty (fst(exp (skip(lex s) []))) ;;
