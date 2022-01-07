@@ -31,7 +31,7 @@ type token = CO | CC | LP | RP | EQ | COL | ARR | LAM | ADD | SUB | MUL | LEQ | 
 let char2digit s =
   let s = String.make 1 s in
   match s with
-  | "1" -> 1 | "4" -> 4 | "7" -> 7
+  | "0" -> 0 | "1" -> 1 | "4" -> 4 | "7" -> 7
   | "2" -> 2 | "5" -> 5 | "8" -> 8
   | "3" -> 3 | "6" -> 6 | "9" -> 9
   | _ -> failwith "char2digit: unknown character"
