@@ -247,7 +247,7 @@ and sexp' b1 (t : token list) = match t with
   | t -> (b1,t)
 and mexp (tl : token list) = let (b1,t) = aexp tl in mexp' b1 t
 and mexp' b1 (t : token list) = match t with
-  | MUL::t -> let (b2,t) = aexp t in aexp' (Oapp(Mul,b1,b2)) t
+  | MUL::t -> let (b2,t) = aexp t in mexp' (Oapp(Mul,b1,b2)) t
   | t -> (b1,t)
 and aexp (tl : token list) = let (b1,t) = pexp tl in aexp' b1 t
 and aexp' b1 (t : token list) = match t with
