@@ -3,8 +3,9 @@ Small interpreter written in Meta-Language OCaml for Object-Language "Mini-OCaml
 
 ## Table of contents
 1. [ToDo Features](https://github.com/david-prv/mini-ocaml#todo-features)
-2. [Abstract Grammar](https://github.com/david-prv/mini-ocaml#abstract-grammar)
-3. [Usage](https://github.com/david-prv/mini-ocaml#usage)
+2. [Known Issues](https://github.com/david-prv/mini-ocaml#known-issues)
+3. [Abstract Grammar](https://github.com/david-prv/mini-ocaml#abstract-grammar)
+4. [Usage](https://github.com/david-prv/mini-ocaml#usage)
     * [Working Examples](https://github.com/david-prv/mini-ocaml#working-examples)
 5. [How does it work](https://github.com/david-prv/mini-ocaml#how-does-it-work)
     * [4 Layers](https://github.com/david-prv/mini-ocaml#4-layers) 
@@ -17,6 +18,10 @@ Small interpreter written in Meta-Language OCaml for Object-Language "Mini-OCaml
 - [x] Type Checking / Guessing
 - [x] Evaluation
 - [x] Advanced lexer / parser: function types as input, comments, ...
+
+## Known Issues:
+- [ ] Evaluator does not check for empty token lists
+- [ ] Parser does not parse function types properly 
 
 ## Abstract Grammar
 ```bnf
