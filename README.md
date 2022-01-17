@@ -20,8 +20,8 @@ Small interpreter written in Meta-Language OCaml for Object-Language "Mini-OCaml
 - [x] Advanced lexer / parser: function types as input, comments, ...
 
 ## Known Issues:
-- [ ] Evaluator does not check for empty token lists
-- [ ] Parser does not parse function types properly 
+- [FIXED] Evaluator does not check for empty token lists
+- Parser does not parse function types properly 
 
 ## Abstract Grammar
 ```bnf
