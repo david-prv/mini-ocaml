@@ -41,8 +41,8 @@ let update (environment : ('a,'b) env) key value : ('a,'b) env =
   (key, value) :: environment
         
 let fst (a, b) = match b with
-         | [] -> a
-         | _ -> failwith "exp: token list is not empty"
+  | [] -> a
+  | _ -> failwith "exp: token list is not empty"
                
 let rec mem x l =
   match l with
@@ -204,7 +204,7 @@ let lex (s : string) =
               end
             | 'r'::'e'::'c'::t -> lex (i+3) (REC::tl)
             | 'i'::'n'::t -> begin 
-                match t with | 't'::t -> failwith "lex: 'int' is a type, not a keyword"
+                match t with | 't'::t -> lex (i+3) (TY(Int)::tl)
                              | _ -> lex (i+2) (IN::tl)
               end
             | 't'::'r'::'u'::'e'::t -> lex (i+4) (CON(Bcon true)::tl)
@@ -220,6 +220,20 @@ let lex (s : string) =
 
 (* ------ PARSER ------ *) 
 
+let rec typer l : ty * token list = 
+  let (t,l) = pty l in ty' t l
+and ty' t1 l = match l with 
+  | ARR::l ->
+      let (t2,l) = pty l in
+      let (t,l) = ty' t2 l in
+      (Arrow (t1,t),l)
+  | l -> (t1,l)
+and pty l = match l with
+  | TY(Bool)::l -> (Bool, l)
+  | TY(Int)::l -> (Int, l)
+  | LP::l -> let (t,l) = typer l in (t, verify RP l)
+  |  _ -> failwith "typer: syntax error" 
+
 let rec exp (tl : token list) : exp * token list = 
   match tl with 
   | IF::t -> let (b1, t) = exp t in
@@ -232,7 +246,10 @@ let rec exp (tl : token list) : exp * token list =
   | LET::REC::VAR f::VAR x::EQ::t ->  let (b1,t) = exp t in
       let (b2,t) = exp (verify IN t) in
       (Letrec (f,x,b1,b2),t)
-  | LET::REC::VAR f::LP::VAR x::COL::TY t1::RP::COL::TY t2::EQ::t -> let (b1,t) = exp t in
+  | LET::REC::VAR f::LP::VAR x::COL::t ->
+      let (t1,t) = typer t in
+      let (t2,t) = typer (verify COL (verify RP t)) in
+      let (b1,t) = exp (verify EQ t) in
       let (b2,t) = exp (verify IN t) in
       (Letrecty (f,x,t1,t2,b1,b2), t)
   | LAM::VAR x::COL::TY t1::ARR::t -> let (b1,t) = exp t in (Lamty(x,t1,b1), t)
