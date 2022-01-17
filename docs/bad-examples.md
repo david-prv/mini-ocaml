@@ -5,6 +5,7 @@ Table of Contents:
 * [Illegal operators](#illegal-operators)
 * [Free variables](#free-variables)
 * [Ill-types](#ill-types)
+* [Not empty tokenlist](#not-empty-tokenlist)
 
 ## Illegal application
 ```ocaml
@@ -43,4 +44,13 @@ checkStr "let x = if 2 <= 3 then true else 3 in x" ;;
 Exception:
 ```ocaml
 Exception: (Failure "check_if: 'if' is ill-typed")
+```
+
+## Not empty Tokenlist
+```ocaml
+evalStr "let x = 1 in x in" ;;
+```
+Exception:
+```ocaml
+Exception: (Failure "exp: token list is not empty")
 ```
