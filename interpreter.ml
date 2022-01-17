@@ -40,7 +40,9 @@ let empty : ('a, 'b) env = []
 let update (environment : ('a,'b) env) key value : ('a,'b) env =
   (key, value) :: environment
         
-let fst (a, b) = a ;;  
+let fst (a, b) = match b with
+         | [] -> a
+         | _ -> failwith "exp: token list is not empty"
                
 let rec mem x l =
   match l with
@@ -330,5 +332,6 @@ and eval_if env v ex1 ex2 = match v with
 (* ------ TOP-LEVEL COMMANDS ------ *)  
 
 let env = empty ;;
+  
 let checkStr s = check env (fst(exp (skip(lex s) []))) ;;
 let evalStr s = eval env (fst(exp (skip(lex s) []))) ;;
