@@ -21,7 +21,7 @@ Small interpreter written in Meta-Language OCaml for Object-Language "Mini-OCaml
 
 ## Known Issues:
 - [FIXED] Evaluator does not check for empty token lists
-- Parser does not parse function types properly 
+- [FIXED] Parser does not parse function types properly 
 
 ## Abstract Grammar
 ```bnf
